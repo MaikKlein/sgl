@@ -1,0 +1,62 @@
+#ifndef SHADER_H
+#define SHADER_H
+#include "ihandle.h"
+#include "filereader.h"
+#include<string>
+#include <iostream>
+#include<GL/glew.h>
+
+class ShaderInterface : public HandleInterface {
+    public:
+        virtual ~ShaderInterface() {}
+        virtual void SetShaderSourceFromFile( std::string path ) = 0;
+        virtual void SetShaderSourceFromString( std::string source ) = 0;
+        virtual bool CreateShader() = 0;
+        virtual GLenum GetShadertype() = 0;
+};
+class BaseShader : public ShaderInterface {
+        std::string shader_source_;
+    public:
+        BaseShader();
+        ~BaseShader() {
+            glDeleteShader( GetHandle() );
+        }
+        void SetShaderSourceFromFile( std::string path );
+        void SetShaderSourceFromString( std::string source );
+        bool CreateShader();
+};
+class VertexShader : public BaseShader {
+    public:
+        GLenum GetShadertype() {
+            return GL_VERTEX_SHADER;
+        }
+};
+class FragmentShader : public BaseShader {
+    public:
+        GLenum GetShadertype() {
+            return GL_FRAGMENT_SHADER;
+        }
+};
+
+
+class ShaderProgramInterface : public HandleInterface
+{
+    public:
+        virtual void AttachShader( ShaderInterface const &s ) = 0;
+        virtual void Link() = 0;
+        virtual void Use() = 0;
+};
+
+class ShaderProgram : public ShaderProgramInterface {
+    public:
+        ShaderProgram();
+        void AttachShader( ShaderInterface const &s );
+        void Link();
+        void Use();
+};
+
+
+
+
+
+#endif // SHADER_H
